@@ -8,25 +8,58 @@
 #define H 4
 #define BOMBS_N 7
 
+const int bombs[BOMBS_N][2] = {
+//{y, x}
+  {1, 0},
+  {1, 1},
+  {1, 2},
+  {3, 6},
+  {2, 6},
+  {0, 7},
+  {3, 5},
+};
+
+bool isBomb(int col, int row) {
+    for(int i=0; i<BOMBS_N; i++) {
+        if(bombs[i][0] == col && bombs[i][1] == row)
+            return true;
+    }
+    return false;
+}
+
+int totalBombs(int col, int row) {
+    int total = 0;
+    for(int i=0; i<BOMBS_N; i++) {
+        bool u = col == 0;
+        bool d = col == H - 1;
+        bool l = row == 0;
+        bool r = row == W - 1;
+        
+        // a b c
+        // d   e
+        // f g h
+        if(!u && !l) total += (bombs[i][0]==col-1 && bombs[i][1]==row-1); //a
+        if(!u)       total += (bombs[i][0]==col-1 && bombs[i][1]==row  ); //b
+        if(!u && !r) total += (bombs[i][0]==col-1 && bombs[i][1]==row+1); //c
+        if(!l)       total += (bombs[i][0]==col   && bombs[i][1]==row-1); //d
+        if(!r)       total += (bombs[i][0]==col   && bombs[i][1]==row+1); //e
+        if(!d && !l) total += (bombs[i][0]==col+1 && bombs[i][1]==row-1); //f
+        if(!d)       total += (bombs[i][0]==col+1 && bombs[i][1]==row  ); //g
+        if(!d && !r) total += (bombs[i][0]==col+1 && bombs[i][1]==row+1); //h
+    }
+    return total;
+}
+
 int main() {
   char tiles[H][W];
   
-  const int bombs[BOMBS_N][2] = {
-   // {y, x}
-      {1, 0},
-      {1, 1},
-      {1, 2},
-      {3, 6},
-      {2, 6},
-      {0, 7},
-      {3, 5},
-  };
   
-//   for(int i=0; i<BOMBS_N; i++)
-//     tiles[bombs[i][0]][bombs[i][1]] = 'B';
+  
+  for(int i=0; i<BOMBS_N; i++)
+    tiles[bombs[i][0]][bombs[i][1]] = 'B';
   for(int i=0; i<H; i++)
     for(int j=0; j<W; j++)
-    //   if(tiles[i][j] != 'B'):
+      if(tiles[i][j] != 'B')
         tiles[i][j] = '#';
 
   bool exit = false;
@@ -48,56 +81,31 @@ int main() {
     printf("input_row (0-%d): ", W);
     fflush( stdout );
     scanf("%d", &input_row);
-
-    // bool _a=0, _b=0, _c=0, _d=0, _e=0, _f=0, _g=0, _h=0;
-    // bool u = input_col == 0;
-    // bool d = input_col == H - 1;
-    // bool l = input_row == 0;
-    // bool r = input_row == W - 1;
     
-    // if(!u && !l)
-    //   _a = tiles[input_col-1][input_row-1] == 'B';
-    // if(!u)
-    //   _b = tiles[input_col-1][input_row] == 'B';
-    // if(!u && !r)
-    //   _c = tiles[input_col-1][input_row+1] == 'B';
-    // if(!l)
-    //   _d = tiles[input_col][input_row-1] == 'B';
-    // if(!r)
-    //   _e = tiles[input_col][input_row+1] == 'B';
-    // if(!d && !l)
-    //   _f = tiles[input_col+1][input_row-1] == 'B';
-    // if(!d)
-    //   _g = tiles[input_col+1][input_row] == 'B';
-    // if(!d && !r)
-    //   _h = tiles[input_col+1][input_row+1] == 'B';
-
-    // int total = _a+_b+_c+_d+_e+_f+_g+_h;
-    
-    int total = 0;
-    for(int i=0; i<BOMBS_N; i++) {
-        //bool _a=0, _b=0, _c=0, _d=0, _e=0, _f=0, _g=0, _h=0;
-        bool u = input_col == 0;
-        bool d = input_col == H - 1;
-        bool l = input_row == 0;
-        bool r = input_row == W - 1;
-        if(!u && !l) total += (bombs[i][0]==input_col-1 && bombs[i][1]==input_row-1);
-        if(!u)       total += (bombs[i][0]==input_col-1 && bombs[i][1]==input_row  );
-        if(!u && !r) total += (bombs[i][0]==input_col-1 && bombs[i][1]==input_row+1);
-        if(!l)       total += (bombs[i][0]==input_col   && bombs[i][1]==input_row-1);
-        if(!r)       total += (bombs[i][0]==input_col   && bombs[i][1]==input_row+1);
-        if(!d && !l) total += (bombs[i][0]==input_col+1 && bombs[i][1]==input_row-1);
-        if(!d)       total += (bombs[i][0]==input_col+1 && bombs[i][1]==input_row  );
-        if(!d && !r) total += (bombs[i][0]==input_col+1 && bombs[i][1]==input_row+1);
+    if(isBomb(input_col, input_row)) {
+        printf("GAME OVER\n");
+        exit = true;
+        break;
     }
-    if(total != 0)
+    
+    int total = totalBombs(input_col, input_row);
+    if(total != 0) {
       tiles[input_col][input_row] = toString(total);
-    else
+    }else{   
       tiles[input_col][input_row] = '.';
+      
+      int col = input_col;
+      int row = input_row;
+      while(total == 0)   {
+          bool u = col == 0;
+          bool d = col == H - 1;
+          bool l = row == 0;
+          bool r = row == W - 1;
+          
+          // AAAAAAAAAAAAAAAAAAAAAAAAAAA
+      }
+    }
   }
-  //_a _b _c
-  //_d    _e
-  //_f _g _h
 
   return 0;
 }
