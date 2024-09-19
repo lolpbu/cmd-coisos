@@ -13,7 +13,7 @@
 // char tiles[H][W];
 
 #define DEFAULT_W 20
-#define DEFAULT_H 12
+#define DEFAULT_H 10
 #define DEFAULT_BOMBS_N 40
 
 int W, H, BOMBS_N;
@@ -66,7 +66,6 @@ void fill_empty(int row, int col) {
 
 	tiles[row][col] = '.';
 	found++;
-	
 
   	if(row != 0)  fill_empty(row-1, col  ); //u
   	if(col != 0)  fill_empty(row  , col-1); //l
@@ -84,8 +83,8 @@ bool has_dup() {
 }
 
 void gen_bombs() {
-  while(has_dup()) {
-        for (int i = 0; i < BOMBS_N; i++) {
+    while(has_dup()) {
+        for (int i=0; i<BOMBS_N; i++) {
             bombs[i][0] = rand()%H;
             bombs[i][1] = rand()%W;
         }
@@ -110,32 +109,31 @@ void print_tiles() {
 }
 
 int main(const int argc, const char** argv) {
-	if(argc < 2 || argc > 4) {
+	if(argc<2 || argc>4) {
 		W = DEFAULT_W;
 		H = DEFAULT_H;
 		BOMBS_N = DEFAULT_BOMBS_N;
 		printf("USO: coiso.exe NUMERO_DE_LINHAS(2-25) NUMERO_DE_COLUNAS[2-50] NUMERO_DE_BOMBAS[2-L*C-1]\n");
-		printf("USANDO CONFIGURACOES NORMAIS: %dx%d, %d bombas\n", W, H, BOMBS_N);
-		system("PAUSE");
+		printf("USANDO CONFIGURACOES: %dx%d, %d bombas\n", W, H, BOMBS_N);
 	} else {
 		char* p;
 		errno = 0;
 
 		W = strtol(argv[1], &p, 10);
-		if(W<2 || W>25 || errno!=0 || *p!='\0'|| W>INT_MAX || W<INT_MIN) {
-			printf("NUMERO INVALIDO DE LINHAS: %d, deve ser entre 2 e 50\n", argv[1]);
+		if(W<2 || W>25 || errno!=0 || *p!='\0') {
+			printf("NUMERO INVALIDO DE LINHAS: %s, deve ser entre 2 e 50\n", argv[1]);
 			return 1;
 		}
 
 		H = strtol(argv[2], &p, 10);
-		if(H<2 || H>50 || errno!=0 || *p!='\0'|| H>INT_MAX || H<INT_MIN) {
-			printf("NUMERO INVALIDO DE COLUNAS: %d, deve ser entre 2 e 25\n", argv[2]);
+		if(H<2 || H>50 || errno!=0 || *p!='\0') {
+			printf("NUMERO INVALIDO DE COLUNAS: %s, deve ser entre 2 e 25\n", argv[2]);
 			return 1;
 		}
 
 		BOMBS_N = strtol(argv[3], &p, 10);
-		if(BOMBS_N<2 || BOMBS_N>W*H -1|| errno!=0 || *p!='\0'|| BOMBS_N>INT_MAX || BOMBS_N<INT_MIN) {
-			printf("NUMERO INVALIDO DE BOMBAS: %d, deve ser entre 2 e %d\n", argv[3], W*H -1);
+		if(BOMBS_N<2 || BOMBS_N>W*H -1|| errno!=0 || *p!='\0') {
+			printf("NUMERO INVALIDO DE BOMBAS: %s, deve ser entre 2 e %d\n", argv[3], W*H -1);
 			return 1;
 		}
 	}
@@ -144,11 +142,11 @@ int main(const int argc, const char** argv) {
 
 	bombs = (int**) malloc(BOMBS_N * sizeof(int*));
 	for (int i=0; i<BOMBS_N; i++)
-        bombs[i] = malloc(2 * sizeof(int));
+        bombs[i] = (int*) malloc(2 * sizeof(int));
 	
 	tiles = (char**) malloc(H * sizeof(char*));
 	for(int i=0; i<H; i++)
-		tiles[i] = malloc(W * sizeof(char));
+		tiles[i] = (char*) malloc(W * sizeof(char));
 
   	gen_bombs();
   
